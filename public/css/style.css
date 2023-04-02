@@ -1,0 +1,29 @@
+/* background color */
+
+/* a4 page for printing */
+
+.a4ben {
+    background-color: white;
+    width: 1100px;
+    height: 1640px;
+    /* height: 1122px; */
+    /* margin: 30mm 45mm 30mm 45mm; */
+    margin: 0 auto;
+    padding: 20px;
+    /* margin-top: 50px; */
+    /* margin-bottom: 50px; */
+    /* padding-bottom: 250px; */
+
+    /* border */
+    /* font size 12 pt */
+    font-size: 12pt;
+    /* color black */
+    color: black;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+}
+
+/* border tabel black */
+
+.table > tbody > tr > td {
+    vertical-align: middle;
+}
