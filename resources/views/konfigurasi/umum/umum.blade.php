@@ -49,7 +49,7 @@
                     @csrf
                     {{-- logo using filepond --}}
                     <div class="form-group row" style="margin: 5px 5px 5px 5px;">
-                        <label for="logo" class="col-sm-4 col-form-label text-right ">Logo</label>
+                        <label for="logo" class="col-sm-4 col-form-label text-left ">Logo</label>
                         <div class="col-sm-8">
                             <div>
                                 <img src="{{ asset('') }}{{ $umum->logoUrl }}" alt="logo" id="preview"

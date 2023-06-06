@@ -1,14 +1,16 @@
 <?php
 
+use App\Http\Controllers\Api\UmumApi;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\LoketApi;
+use App\Http\Controllers\Api\LayananApi;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\EditProfileApi;
+use App\Http\Controllers\Api\AlurApiController;
+use App\Http\Controllers\Api\UserApiController;
+use App\Http\Controllers\Api\AntreanApiController;
 use App\Http\Controllers\Api\CrudInvoiceApiController;
 use App\Http\Controllers\Api\CrudQuotationApiController;
-use App\Http\Controllers\Api\EditProfileApi;
-use App\Http\Controllers\Api\LayananApi;
-use App\Http\Controllers\Api\LoketApi;
-use App\Http\Controllers\Api\UmumApi;
-use App\Http\Controllers\Api\UserApiController;
-use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,6 +104,34 @@ Route::group([
     Route::put('/{id}', [LoketApi::class, 'update']);
     Route::delete('/{id}', [LoketApi::class, 'destroy']);
 });
+
+// Alur Controller
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'alur',
+
+], function ($router) {
+
+    Route::get('/', [AlurApiController::class, 'index']);
+    Route::post('/', [AlurApiController::class, 'create']);
+    Route::post('/{id}', [AlurApiController::class, 'update']);
+    Route::delete('/{id}', [AlurApiController::class, 'destroy']);
+});
+
+// Antrean Controller
+Route::group([
+    'prefix' => 'antrean',
+
+], function ($router) {
+
+    Route::get('/', [AntreanApiController::class, 'index']);
+    Route::post('/', [AntreanApiController::class, 'create']);
+    Route::put('/panggil', [AntreanApiController::class, 'panggil']);
+    Route::post('/{id}', [AntreanApiController::class, 'update']);
+    Route::delete('/{id}', [AntreanApiController::class, 'destroy']);
+});
+
 
 // Umum Controller
 Route::group([

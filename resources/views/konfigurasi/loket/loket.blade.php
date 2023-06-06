@@ -73,6 +73,7 @@
                                             echo '<option value="' . $i . '" style="background-color: #222F3E; ">' . $i . '</option>';
                                         }
                                     }
+                                    echo '<option value="' . 99 . '" style="background-color: #222F3E; ">' . 99 . '</option>';
                                     
                                 @endphp
 

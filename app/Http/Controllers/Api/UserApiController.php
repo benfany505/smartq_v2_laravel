@@ -60,7 +60,7 @@ class UserApiController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Unauthorized',
-                'data' => null,
+                'data' => $request->requestorUsername,
             ], 401);
         }
         // get all users except the authenticated user

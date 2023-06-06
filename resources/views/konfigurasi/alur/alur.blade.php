@@ -49,7 +49,7 @@
         <div class="row">
             <div class="col-sm-4" style="color: white">
                 <div class="contentHeader">
-                    <div class="title-header">
+                    <div class="title-header" id="title_header">
                         {{-- <i class="fas fa-history pr-2"></i> --}}
                         Tambah Alur
                     </div>
@@ -80,7 +80,7 @@
                             <Select multiple="multiple" class="form-control form-control-sm" id="pilihan_loket"
                                 name="pilihan_loket" required style="background-color: transparent; color: white">
                                 @foreach ($loket as $item)
-                                    <option style="background-color: #222F3E; " value="{{ $item->id }}">
+                                    <option style="background-color: #222F3E; " value="{{ $item->nomor }}">
                                         {{ $item->nomor }}. {{ $item->nama }}</option>
                                 @endforeach
                             </Select>
@@ -95,7 +95,7 @@
                             <Select multiple="multiple" class="form-control form-control-sm" id="pilihan_layanan"
                                 name="pilihan_layanan" required style="background-color: transparent; color: white">
                                 @foreach ($layanan as $item)
-                                    <option style="background-color: #222F3E; " value="{{ $item->id }}">
+                                    <option style="background-color: #222F3E; " value="{{ $item->kode }}">
                                         {{ $item->kode }}. {{ $item->nama }}</option>
                                 @endforeach
                             </Select>
@@ -110,9 +110,10 @@
                             <Select multiple="multiple" class="form-control form-control-sm" id="pilihan_transfer"
                                 name="pilihan_transfer" required style="background-color: transparent; color: white">
                                 @foreach ($loket as $item)
-                                    <option style="background-color: #222F3E; " value="{{ $item->id }}">
+                                    <option style="background-color: #222F3E; " value="{{ $item->nomor }}">
                                         {{ $item->nomor }}. {{ $item->nama }}</option>
                                 @endforeach
+
                             </Select>
                         </div>
                     </div>
@@ -124,6 +125,9 @@
 
                     <div class="form-group  text-right col-sm mt-2">
                         <button class="btn btn-primary btn-xs" id="simpan">Tambahkan</button>
+                        <button class="btn btn-info btn-xs" id="cancel" style="display: none">Cancel</button>
+                        <button class="btn btn-warning btn-xs" id="update" style="display: none">Update</button>
+
                     </div>
                 </form>
 
@@ -137,6 +141,79 @@
                         List Alur
                     </div>
                 </div>
+
+                {{-- echo $alur --}}
+
+                <table class="table table-sm table-stripped mt-1" id="table_alur">
+
+                    <thead>
+                        <tr>
+
+                            <th>Alur</th>
+                            <th>Loket</th>
+                            <th>Layanan</th>
+                            <th>Transfer Ke</th>
+                            <th>Status</th>
+                            <th></th>
+                            <th scope="col" style="display: none">id</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($alur as $item)
+                            <tr>
+                                {{-- invisible id --}}
+
+                                {{-- visible nomor --}}
+                                <td class="text-left">{{ $item->nama }}. {{ $item->keterangan }}</td>
+                                <td class="text-left">{{ $item->list_loket }}.
+                                    @foreach ($loket as $item2)
+                                        @if ($item2->nomor == $item->list_loket)
+                                            {{ $item2->nama }}
+                                        @endif
+                                    @endforeach
+                                </td>
+                                <td class="text-left">
+                                    {{-- clickable icon to sneak name of list layanan --}}
+                                    <i class="fas fa-info-circle mr-1" data-html="true" data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="
+                            @foreach ($layanan as $item2)
+                                @if (in_array($item2->kode, explode(',', $item->list_layanan)))
+                                    {{ $item2->kode }}. {{ $item2->nama }} <br>
+                                    {{-- break line html --}}
+                                @endif @endforeach
+                        "></i>
+                                    {{ $item->list_layanan }}
+
+                                </td>
+                                <td class="text-left">
+                                    {{-- clickable icon to sneak name of list transfer --}}
+                                    <i class="fas fa-info-circle mr-1" data-html="true" data-toggle="tooltip"
+                                        data-placement="top"
+                                        title="
+                                    @foreach ($loket as $item2)
+                                        @if (in_array($item2->nomor, explode(',', $item->list_transfer)))
+                                            {{ $item2->nomor }}. {{ $item2->nama }} <br>
+                                            {{-- break line html --}}
+                                        @endif @endforeach
+                                "></i>
+                                    {{ $item->list_transfer }}
+                                </td>
+
+                                {{-- status if 1=enabled 0=disabled --}}
+                                <td class="text-left">{{ $item->status == 1 ? 'Enabled' : 'Disabled' }}</td>
+                                {{-- action button alight right --}}
+                                <td class="text-right
+                                ">
+                                    <button class="btn btn-primary btn-xs" id="edit">Edit</button>
+                                    <button class="btn btn-danger btn-xs" id="hapus">Hapus</button>
+                                </td>
+                                <td style="display: none;" id="data-id">{{ $item->id }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+
+                </table>
             </div>
         </div>
 
@@ -185,129 +262,7 @@
     <script src="{{ asset('') }}assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
     <script src="{{ asset('') }}assets/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
     <script src="{{ asset('') }}assets/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    {{-- <script>
-        $(document).ready(function() {
-            $("#pilihan_transfer").CreateMultiCheckBox({
-                width: '230px',
-                defaultText: 'Select Below',
-                height: '250px'
-            });
-        });
-        $(document).ready(function() {
-            $(document).on("click", ".MultiCheckBox", function() {
-                var detail = $(this).next();
-                detail.show();
-            });
 
-            $(document).on("click", ".MultiCheckBoxDetailHeader input", function(e) {
-                e.stopPropagation();
-                var hc = $(this).prop("checked");
-                $(this).closest(".MultiCheckBoxDetail").find(".MultiCheckBoxDetailBody input").prop(
-                    "checked", hc);
-                $(this).closest(".MultiCheckBoxDetail").next().UpdateSelect();
-            });
-
-            $(document).on("click", ".MultiCheckBoxDetailHeader", function(e) {
-                var inp = $(this).find("input");
-                var chk = inp.prop("checked");
-                inp.prop("checked", !chk);
-                $(this).closest(".MultiCheckBoxDetail").find(".MultiCheckBoxDetailBody input").prop(
-                    "checked", !chk);
-                $(this).closest(".MultiCheckBoxDetail").next().UpdateSelect();
-            });
-
-            $(document).on("click", ".MultiCheckBoxDetail .cont input", function(e) {
-                e.stopPropagation();
-                $(this).closest(".MultiCheckBoxDetail").next().UpdateSelect();
-
-                var val = ($(".MultiCheckBoxDetailBody input:checked").length == $(
-                    ".MultiCheckBoxDetailBody input").length)
-                $(".MultiCheckBoxDetailHeader input").prop("checked", val);
-            });
-
-            $(document).on("click", ".MultiCheckBoxDetail .cont", function(e) {
-                var inp = $(this).find("input");
-                var chk = inp.prop("checked");
-                inp.prop("checked", !chk);
-
-                var multiCheckBoxDetail = $(this).closest(".MultiCheckBoxDetail");
-                var multiCheckBoxDetailBody = $(this).closest(".MultiCheckBoxDetailBody");
-                multiCheckBoxDetail.next().UpdateSelect();
-
-                var val = ($(".MultiCheckBoxDetailBody input:checked").length == $(
-                    ".MultiCheckBoxDetailBody input").length)
-                $(".MultiCheckBoxDetailHeader input").prop("checked", val);
-            });
-
-            $(document).mouseup(function(e) {
-                var container = $(".MultiCheckBoxDetail");
-                if (!container.is(e.target) && container.has(e.target).length === 0) {
-                    container.hide();
-                }
-            });
-        });
-
-        var defaultMultiCheckBoxOption = {
-            width: '220px',
-            defaultText: 'Select Below',
-            height: '200px'
-        };
-
-        jQuery.fn.extend({
-            CreateMultiCheckBox: function(options) {
-
-                var localOption = {};
-                localOption.width = (options != null && options.width != null && options.width != undefined) ?
-                    options.width : defaultMultiCheckBoxOption.width;
-                localOption.defaultText = (options != null && options.defaultText != null && options
-                        .defaultText != undefined) ? options.defaultText : defaultMultiCheckBoxOption
-                    .defaultText;
-                localOption.height = (options != null && options.height != null && options.height !=
-                    undefined) ? options.height : defaultMultiCheckBoxOption.height;
-
-                this.hide();
-                this.attr("multiple", "multiple");
-                var divSel = $("<div class='MultiCheckBox'>" + localOption.defaultText +
-                    "<span class='k-icon k-i-arrow-60-down'><svg aria-hidden='true' focusable='false' data-prefix='fas' data-icon='sort-down' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 512' class='svg-inline--fa fa-sort-down fa-w-10 fa-2x'><path fill='currentColor' d='M41 288h238c21.4 0 32.1 25.9 17 41L177 448c-9.4 9.4-24.6 9.4-33.9 0L24 329c-15.1-15.1-4.4-41 17-41z' class=''></path></svg></span></div>"
-                ).insertBefore(this);
-                divSel.css({
-                    "width": localOption.width
-                });
-
-                var detail = $(
-                    "<div class='MultiCheckBoxDetail'><div class='MultiCheckBoxDetailHeader'><input type='checkbox' class='mulinput' value='-1982' /><div>Select All</div></div><div class='MultiCheckBoxDetailBody'></div></div>"
-                ).insertAfter(divSel);
-                detail.css({
-                    "width": parseInt(options.width) + 10,
-                    "max-height": localOption.height
-                });
-                var multiCheckBoxDetailBody = detail.find(".MultiCheckBoxDetailBody");
-
-                this.find("option").each(function() {
-                    var val = $(this).attr("value");
-
-                    if (val == undefined)
-                        val = '';
-
-                    multiCheckBoxDetailBody.append(
-                        "<div class='cont'><div><input type='checkbox' class='mulinput' value='" +
-                        val + "' /></div><div>" + $(this).text() + "</div></div>");
-                });
-
-                multiCheckBoxDetailBody.css("max-height", (parseInt($(".MultiCheckBoxDetail").css(
-                    "max-height")) - 28) + "px");
-            },
-            UpdateSelect: function() {
-                var arr = [];
-
-                this.prev().find(".mulinput:checked").each(function() {
-                    arr.push($(this).val());
-                });
-
-                this.val(arr);
-            },
-        });
-    </script> --}}
 
     <link rel="stylesheet" type="text/css" href="{{ asset('css/multiple-select.css') }}">
     <script src="{{ asset('js/multiple-select.js') }}"></script>
@@ -339,7 +294,7 @@
             // get value
             var value = $(this).val();
             // check if value is 1
-            if (value == 1) {
+            if (value != 0) {
                 //    show div_pilihan_loket with animation ease in
                 $('#div_pilihan_loket').show('easeIn');
                 //   show div_pilihan_layanan with animation ease in
@@ -354,6 +309,321 @@
                 // hide div with id id="pilihan_transfer"
                 $('#div_pilihan_transfer').hide('easeOut');
             }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#example1').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
+    </script>
+
+    <script>
+        const myForm = document.getElementById('form_alur');
+        const pilihan_alur = document.getElementById('pilihan_alur');
+        const pilihan_loket = document.getElementById('pilihan_loket');
+        const pilihan_layanan = document.getElementById('pilihan_layanan');
+        const pilihan_transfer = document.getElementById('pilihan_transfer');
+        const simpan = document.getElementById('simpan');
+        const update = document.getElementById('update');
+        const cancel = document.getElementById('cancel');
+
+        // on simpan click
+        simpan.addEventListener('click', function(e) {
+            // prevent default
+            e.preventDefault();
+            // get multiple select value on pilihan_loket
+            var pilihan_loket_value = $('#pilihan_loket').multipleSelect('getSelects');
+            // get multiple select value on pilihan_layanan
+            var pilihan_layanan_value = $('#pilihan_layanan').multipleSelect('getSelects');
+            // get multiple select value on pilihan_transfer
+            var pilihan_transfer_value = $('#pilihan_transfer').multipleSelect('getSelects');
+            // get value on pilihan_alur
+            var pilihan_alur_value = pilihan_alur.value;
+            // check if pilihan_alur_value is 1
+            // convert ["5","6","7","8","9","10"] to 5,6,7,8,9,10
+            pilihan_loket_value = pilihan_loket_value.join(',');
+            pilihan_layanan_value = pilihan_layanan_value.join(',');
+            pilihan_transfer_value = pilihan_transfer_value.join(',');
+            // check if pilihan_alur_value is empty
+
+            // check if pilihan_loket_value is empty
+            if (pilihan_loket_value == '') {
+                // show alert
+                alert('Pilih Loket');
+                return false;
+            }
+            // check if pilihan_layanan_value is empty
+            if (pilihan_layanan_value == '') {
+                // show alert
+                alert('Pilih Layanan');
+                // focus on pilihan_layanan
+                pilihan_layanan.focus();
+                // return false
+                return false;
+            }
+            // check if pilihan_transfer_value is empty
+            if (pilihan_transfer_value == '') {
+                // show alert
+                alert('Pilih Loket Tujuan');
+                // focus on pilihan_transfer
+                pilihan_transfer.focus();
+                // return false
+                return false;
+            }
+
+            var myJson = {
+                nama: pilihan_alur_value,
+                list_loket: pilihan_loket_value,
+                list_layanan: pilihan_layanan_value,
+                list_transfer: pilihan_transfer_value,
+                keterangan: pilihan_alur.options[pilihan_alur.selectedIndex].text,
+                requestorUsername: '{{ session()->get('username') }}',
+            };
+
+            myForm.method = 'post';
+            myForm.action = '/api/alur';
+            var myJsonString = JSON.stringify(myJson);
+            console.log(myJsonString);
+            const formData = new FormData(myForm);
+            const xhr = new XMLHttpRequest();
+            var token = "Bearer " + '{{ session()->get('tokenJwt') }}';
+            xhr.open(myForm.method, myForm.action);
+            xhr.setRequestHeader("Authorization", "Bearer " +
+                '{{ session()->get('tokenJwt') }}');
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(myJsonString);
+            xhr.onload = function() {
+                if (xhr.status != 200) {
+                    alert(`Error ${xhr.status}: ${xhr.statusText}`);
+                } else {
+
+                    // update table without reload page
+                    const response = JSON.parse(xhr.response);
+                    console.log(response);
+                    // reload
+                    location.reload();
+
+                }
+            };
+
+        });
+
+        update.addEventListener('click', function(e) {
+            // prevent default
+            e.preventDefault();
+            // get multiple select value on pilihan_loket
+            var pilihan_loket_value = $('#pilihan_loket').multipleSelect('getSelects');
+            // get multiple select value on pilihan_layanan
+            var pilihan_layanan_value = $('#pilihan_layanan').multipleSelect('getSelects');
+            // get multiple select value on pilihan_transfer
+            var pilihan_transfer_value = $('#pilihan_transfer').multipleSelect('getSelects');
+            // get value on pilihan_alur
+            var pilihan_alur_value = pilihan_alur.value;
+            // check if pilihan_alur_value is 1
+            // convert ["5","6","7","8","9","10"] to 5,6,7,8,9,10
+            pilihan_loket_value = pilihan_loket_value.join(',');
+            pilihan_layanan_value = pilihan_layanan_value.join(',');
+            pilihan_transfer_value = pilihan_transfer_value.join(',');
+            // get id from elemet title_header "Edit Alur 1"
+            var id = document.getElementById('title_header').innerHTML.split(' ')[2];
+            // check if pilihan_alur_value is empty
+
+            // check if pilihan_loket_value is empty
+            if (pilihan_loket_value == '') {
+                // show alert
+                alert('Pilih Loket');
+                return false;
+            }
+            // check if pilihan_layanan_value is empty
+            if (pilihan_layanan_value == '') {
+                // show alert
+                alert('Pilih Layanan');
+                // focus on pilihan_layanan
+                pilihan_layanan.focus();
+                // return false
+                return false;
+            }
+            // check if pilihan_transfer_value is empty
+            if (pilihan_transfer_value == '') {
+                // show alert
+                alert('Pilih Loket Tujuan');
+                // focus on pilihan_transfer
+                pilihan_transfer.focus();
+                // return false
+                return false;
+            }
+
+            var myJson = {
+                nama: pilihan_alur_value,
+                list_loket: pilihan_loket_value,
+                list_layanan: pilihan_layanan_value,
+                list_transfer: pilihan_transfer_value,
+                keterangan: pilihan_alur.options[pilihan_alur.selectedIndex].text,
+                requestorUsername: '{{ session()->get('username') }}',
+            };
+
+            myForm.method = 'POST';
+            myForm.action = '/api/alur/' + id;
+            var myJsonString = JSON.stringify(myJson);
+            console.log(myJsonString);
+            const formData = new FormData(myForm);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open(myForm.method, myForm.action);
+            xhr.setRequestHeader("Authorization", "Bearer " +
+                '{{ session()->get('tokenJwt') }}');
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(myJsonString);
+            xhr.onload = function() {
+                if (xhr.status != 200) {
+                    alert(`Error ${xhr.status}: ${xhr.statusText}`);
+                } else {
+
+                    // update table without reload page
+                    const response = JSON.parse(xhr.response);
+                    console.log(response);
+                    // reload
+                    location.reload();
+
+                }
+            };
+
+
+
+        });
+
+        // cancel 
+        cancel.addEventListener('click', function(e) {
+            // prevent default
+            e.preventDefault();
+            // reload
+            $('#table_alur tr').css('background-color', ''); // get row data 
+            var title = document.getElementById('title_header');
+            title.innerHTML = 'Tambah Alur';
+            // reset form
+
+            $('#simpan').show();
+            $('#update').hide();
+            $('#cancel').hide();
+            // #pilihan_alur option[value="1"]
+            $('#pilihan_alur').val('').change();
+            $('#pilihan_loket').multipleSelect('uncheckAll');
+            $('#pilihan_layanan').multipleSelect('uncheckAll');
+            $('#pilihan_transfer').multipleSelect('uncheckAll');
+
+
+
+
+            // location.reload();
+        });
+
+        // on delete click delete data
+
+        $(document).on('click', '#hapus', function() {
+
+            var currentRow = $(this).closest("tr");
+
+            var id = currentRow.find("td:eq(6)").text();
+
+            var alur = currentRow.find("td:eq(0)").text();
+            var loket = currentRow.find("td:eq(1)").text();
+            var layanan = currentRow.find("td:eq(2)").text();
+
+            loket = loket.replace(/\s/g, '');
+            alur = alur.replace(/\s/g, '');
+            layanan = layanan.replace(/\s/g, '');
+
+
+
+
+
+
+            // show confirmation dialog
+            var r = confirm("Alur : " + alur + "\nLoket : " + loket + "\nLayanan : " +
+                layanan + "\nAre you sure want to delete this data ?");
+
+            if (r == true) {
+                // delete data to database
+                var myJson = {
+                    requestorUsername: '{{ session()->get('username') }}',
+                };
+                var myJsonString = JSON.stringify(myJson);
+                console.log(myJsonString);
+                const xhr = new XMLHttpRequest();
+                // delete based on id
+                xhr.open('DELETE', '/api/alur/' + id);
+
+                xhr.setRequestHeader("Authorization", "Bearer " +
+                    '{{ session()->get('tokenJwt') }}');
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(myJsonString);
+                xhr.onload = function() {
+                    if (xhr.status != 200) {
+                        alert(`Error ${xhr.status}: ${xhr.statusText}`);
+                    } else {
+
+                        const response = JSON.parse(xhr.response);
+                        // reload page 
+                        location.reload();
+                    }
+                };
+            }
+
+        });
+
+        // on edit click put data to form
+        $(document).on('click', '#edit', function() {
+            // clear all bacground color css on every row 
+            $('#table_alur tr').css('background-color', ''); // get row data 
+            var currentRow = $(this).closest("tr");
+            currentRow.css("background-color", "#47535F");
+            var title = document.getElementById('title_header');
+            var id = currentRow.find("td:eq(6)").text();
+            // change title header with last row data
+            title.innerHTML = 'Edit Alur' + ' ' + id;
+            var alur = currentRow.find("td:eq(0)").text();
+            // loket after icon and space 
+            var loket = currentRow.find("td:eq(1)").text();
+            var layanan = currentRow.find("td:eq(2)").text();
+            var transfer = currentRow.find("td:eq(3)").text();
+            layanan = layanan.substring(layanan.indexOf(" ") + 1);
+            // loket first string
+            loket = loket.charAt(0);
+
+            transfer = transfer.replace(/\s/g, '');
+            layanan = layanan.replace(/\s/g, '');
+
+            switch (alur.charAt(0)) {
+                case '1':
+                    //    change value of pilihan_alur to 1
+                    $('#pilihan_alur').val('1').change();
+                    break;
+                case '2':
+                    $('#pilihan_alur').val('2').change();
+                    break;
+                case '3':
+                    $('#pilihan_alur').val('3').change();
+                    break;
+                default:
+                    break;
+            }
+
+            $('#pilihan_loket').multipleSelect('setSelects', loket.split(','));
+            $('#pilihan_layanan').multipleSelect('setSelects', layanan.split(','));
+            $('#pilihan_transfer').multipleSelect('setSelects', transfer.split(','));
+
+
+
+
+            $('#simpan').hide();
+            $('#update').show();
+            $('#cancel').show();
+
         });
     </script>
 @endpush
