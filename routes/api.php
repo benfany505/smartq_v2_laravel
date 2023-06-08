@@ -127,7 +127,7 @@ Route::group([
 
     Route::get('/', [AntreanApiController::class, 'index']);
     Route::post('/', [AntreanApiController::class, 'create']);
-    Route::put('/panggil', [AntreanApiController::class, 'panggil']);
+    Route::put('/panggilTransfer', [AntreanApiController::class, 'panggilTransfer']);
     Route::post('/{id}', [AntreanApiController::class, 'update']);
     Route::delete('/{id}', [AntreanApiController::class, 'destroy']);
 });
