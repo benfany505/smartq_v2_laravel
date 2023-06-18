@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\EditProfileApi;
 use App\Http\Controllers\Api\AlurApiController;
 use App\Http\Controllers\Api\UserApiController;
 use App\Http\Controllers\Api\AntreanApiController;
+use App\Http\Controllers\Api\LaporanApiController;
 use App\Http\Controllers\Api\CrudInvoiceApiController;
 use App\Http\Controllers\Api\CrudQuotationApiController;
 
@@ -132,6 +133,17 @@ Route::group([
     Route::put('/hold', [AntreanApiController::class, 'hold']);
     Route::post('/{id}', [AntreanApiController::class, 'update']);
     Route::delete('/{id}', [AntreanApiController::class, 'destroy']);
+});
+
+// Laporan Controller
+Route::group([
+
+    'middleware' => 'jwt.auth',
+    'prefix' => 'laporan',
+
+], function ($router) {
+
+    Route::get('/', [LaporanApiController::class, 'index']);
 });
 
 

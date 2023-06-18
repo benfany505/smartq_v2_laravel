@@ -3,6 +3,7 @@
 use App\Http\Controllers\Web\AlurController;
 use App\Http\Controllers\Web\EditProfileController;
 use App\Http\Controllers\Web\InvoicesController;
+use App\Http\Controllers\Web\LaporanController;
 use App\Http\Controllers\Web\LayananController;
 use App\Http\Controllers\Web\LoginController;
 use App\Http\Controllers\Web\LoketController;
@@ -47,13 +48,11 @@ Route::post('/logout', [LoginController::class, 'logout']);
 Route::get('/invoice-print', function () {
     // return html view
     return view('sales/invoice-print');
-
 });
 
 Route::get('/downloadpdf', function () {
     // return html view
     return view('sales/invoice-print');
-
 });
 Route::get('/view_invoice/{vtoken}', [InvoicesController::class, 'view']);
 Route::get('/view_quotation/{vtoken}', [QuotationsController::class, 'view']);
@@ -82,16 +81,20 @@ Route::group([
     Route::get('/konfigurasi/alur', [AlurController::class, 'index'])->name('alur');
 
     // Users
-    Route::get('/users/users', [UsersController::class, 'index']);
+    Route::get('/users', [UsersController::class, 'index']);
     // delete user
-    Route::delete('/users/users/{id}', [UsersController::class, 'destroy']);
+    Route::delete('/users/{id}', [UsersController::class, 'destroy']);
+
+    // laporan
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
+
+
 
     // Edit Profile
     Route::get('/profile_saya/edit_profile', [EditProfileController::class, 'show']);
 
     // My Profile
     Route::get('/edit_profile', [ProfileController::class, 'show']);
-
 });
 
 // Upload image

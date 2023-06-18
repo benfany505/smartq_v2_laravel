@@ -107,7 +107,7 @@
                           </ul>
                       </li>
                       <li class="nav-item menu-close">
-                          <a href="/users/users" class="nav-link ">
+                          <a href="/users" class="nav-link ">
                               <i class="nav-icon fas fa-users"></i>
                               <p>
                                   Users
@@ -117,7 +117,7 @@
 
                       </li>
                       <li class="nav-item menu-close">
-                          <a href="#" class="nav-link ">
+                          <a href="/laporan" class="nav-link ">
                               <i class="nav-icon far fa-file-alt"></i>
                               <p>
                                   Laporan
