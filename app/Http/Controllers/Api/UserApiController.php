@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserApiController extends Controller
 {
@@ -36,7 +37,6 @@ class UserApiController extends Controller
                     return response()->json(['token' => $token], 200);
                 }
                 return response()->json(['error' => 'Token Failed'], 401);
-
             } else {
                 return response()->json(['error' => 'Unauthorised'], 401);
             }
@@ -65,6 +65,38 @@ class UserApiController extends Controller
         }
         // get all users except the authenticated user
         $users = User::where('username', '!=', $request->requestorUsername)->get();
+        // $users = User::all();
+
+        // return response
+        return response()->json([
+            'status' => true,
+            'message' => 'Success',
+            'data' => $users,
+        ], 200);
+    }
+
+    public function fastindex(Request $request)
+    {
+
+        // check jwt token
+        $checkuser = JWTAuth::user();
+        if (!$checkuser) {
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        }
+
+        // check if username and password are authenticated
+        $user = DB::table('users')->where('username', $request->requestorUsername)->first();
+        // $user = User::where('username', $request->requestorUsername)->first();
+        if (!$user || $user->role != 'administrator') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'data' => $request->requestorUsername,
+            ], 401);
+        }
+        // get all users except the authenticated user
+        $users = DB::table('users')->where('username', '!=', $request->requestorUsername)->get();
+        // $users = User::where('username', '!=', $request->requestorUsername)->get();
         // $users = User::all();
 
         // return response
@@ -137,14 +169,14 @@ class UserApiController extends Controller
                     'success' => true,
                     'message' => 'User created successfully',
                     'data' => $success,
-                ]);} else {
+                ]);
+            } else {
                 return response()->json([
                     'success' => false,
                     'message' => 'User creation failed',
                     'data' => $success,
                 ], 501);
             }
-
         }
 
         if ($success) {
@@ -250,6 +282,5 @@ class UserApiController extends Controller
 
     public function checkIsAdmin($request)
     {
-
     }
 }

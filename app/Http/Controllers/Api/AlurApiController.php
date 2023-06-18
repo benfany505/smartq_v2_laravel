@@ -22,9 +22,10 @@ class AlurApiController extends Controller
             ], 401);
         }
 
-        //  get all alurs
-        $alur = Alur::all();
-       
+        //  get all alurs order by nama
+        $alur = Alur::orderBy('nama', 'asc')->get();
+
+
         return response()->json([
             'status' => true,
             'message' => 'Success',
@@ -50,7 +51,7 @@ class AlurApiController extends Controller
             'list_loket' => 'required',
             'list_layanan' => 'required',
             'list_transfer' => 'required',
-            
+
         ]);
 
         if ($validator->fails()) {
@@ -66,7 +67,7 @@ class AlurApiController extends Controller
                 'keterangan' => $request->keterangan,
                 'status' => 1,
                 'created_by' => $request->requestorUsername,
-            
+
             ]);
 
             if ($success) {
@@ -76,14 +77,13 @@ class AlurApiController extends Controller
                     'data' => $success,
                 ]);
             }
-        } catch (\Illuminate\Database\QueryException$ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => $ex->getMessage(),
                 // 'data' => $success,
             ], 500);
         }
-
     }
 
     // update alur
@@ -104,7 +104,7 @@ class AlurApiController extends Controller
             'list_loket' => 'required',
             'list_layanan' => 'required',
             'list_transfer' => 'required',
-            
+
         ]);
 
         if ($validator->fails()) {
@@ -120,7 +120,7 @@ class AlurApiController extends Controller
                 'keterangan' => $request->keterangan,
                 'status' => 1,
                 'updated_by' => $request->requestorUsername,
-            
+
             ]);
 
             if ($success) {
@@ -130,14 +130,13 @@ class AlurApiController extends Controller
                     'data' => $success,
                 ]);
             }
-        } catch (\Illuminate\Database\QueryException$ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => $ex->getMessage(),
                 // 'data' => $success,
             ], 500);
         }
-
     }
 
     // destroy alur
@@ -162,14 +161,12 @@ class AlurApiController extends Controller
                     'data' => $success,
                 ]);
             }
-        } catch (\Illuminate\Database\QueryException$ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => $ex->getMessage(),
                 // 'data' => $success,
             ], 500);
         }
-
     }
-    
 }

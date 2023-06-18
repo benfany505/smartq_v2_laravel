@@ -52,6 +52,7 @@ Route::group([
 ], function ($router) {
 
     Route::get('/', [UserApiController::class, 'index']);
+    Route::get('/fastindex', [UserApiController::class, 'fastindex']);
     Route::get('/{id}', [UserApiController::class, 'show']);
     Route::post('/', [UserApiController::class, 'store']);
     Route::put('/{id}', [UserApiController::class, 'update']);
@@ -70,7 +71,6 @@ Route::group([
     Route::post('/{id}', [EditProfileApi::class, 'updateById']);
     Route::put('/password/{id}', [EditProfileApi::class, 'updatePasswordById']);
     Route::put('/password', [EditProfileApi::class, 'updatePassword']);
-
 });
 
 // route group for middleware jwt
@@ -128,6 +128,8 @@ Route::group([
     Route::get('/', [AntreanApiController::class, 'index']);
     Route::post('/', [AntreanApiController::class, 'create']);
     Route::put('/panggilTransfer', [AntreanApiController::class, 'panggilTransfer']);
+    Route::put('/recall', [AntreanApiController::class, 'recall']);
+    Route::put('/hold', [AntreanApiController::class, 'hold']);
     Route::post('/{id}', [AntreanApiController::class, 'update']);
     Route::delete('/{id}', [AntreanApiController::class, 'destroy']);
 });

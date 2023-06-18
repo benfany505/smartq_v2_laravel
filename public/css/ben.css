@@ -19,7 +19,7 @@
     min-width: 150px;
 
     box-shadow: 5px 5px 15px rgba(42, 42, 43, 0.9);
-    font-family: roboto;
+    /* font-family: roboto; */
     text-align: center;
 
     transition: 0.3s ease;

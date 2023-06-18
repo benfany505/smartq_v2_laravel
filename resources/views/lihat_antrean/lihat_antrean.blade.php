@@ -19,6 +19,8 @@
     <!-- summernote -->
     <link rel="stylesheet" href="{{ asset('') }}assets/plugins/summernote/summernote-bs4.min.css">
     <link rel="stylesheet" href="{{ asset('css/filepond.css') }}">
+    {{-- Custom CSS --}}
+    {{-- <link rel="stylesheet" href="{{ asset('css/ben.css') }}"> --}}
 
     {{-- filepond plugins --}}
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>

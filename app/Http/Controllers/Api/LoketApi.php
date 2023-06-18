@@ -22,7 +22,7 @@ class LoketApi extends Controller
             ], 401);
         }
         // get all users
-        $loket = Loket::all();
+        $loket = Loket::orderBy('nomor', 'asc')->get();
 
         return response()->json([
             'status' => true,
@@ -67,14 +67,13 @@ class LoketApi extends Controller
                     'data' => $success,
                 ]);
             }
-        } catch (\Illuminate\Database\QueryException$ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => $ex->getMessage(),
                 // 'data' => $success,
             ], 500);
         }
-
     }
 
     public function update(Request $request, $id)
@@ -115,14 +114,13 @@ class LoketApi extends Controller
                     'data' => $success,
                 ]);
             }
-        } catch (\Illuminate\Database\QueryException$ex) {
+        } catch (\Illuminate\Database\QueryException $ex) {
             return response()->json([
                 'success' => false,
                 'message' => $ex->getMessage(),
                 // 'data' => $success,
             ], 500);
         }
-
     }
 
     // delete

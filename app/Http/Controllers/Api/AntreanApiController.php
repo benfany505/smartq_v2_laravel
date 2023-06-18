@@ -9,6 +9,7 @@ use App\Models\Layanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\HistoryAntrean;
 use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Constraint\IsFalse;
 
@@ -80,6 +81,14 @@ class AntreanApiController extends Controller
                 'sisa_antrean' => $sisa_antrean,
                 'created_by' => $request->requestorUsername,
             ]);
+
+            $history_antrean = HistoryAntrean::create([
+                'kode_layanan' => $request->kode_layanan,
+                'nomor_antrean' => $nomor_antrean, // 'nomor_antrean' => $request->nomor_antrean,
+                'kode_loket' => 0,
+                'mulai' => now(),
+            ]);
+
 
             return response()->json([
                 'status' => true,
@@ -209,7 +218,7 @@ class AntreanApiController extends Controller
                 $query .= "kode_layanan = '$value' OR ";
             }
             $query = substr($query, 0, -4);
-            $query .= ") AND kode_loket = '$request->list_loket' AND jumlah_recall > 0 ORDER BY updated_at ASC LIMIT 1";
+            $query .= ") AND kode_loket = '$request->list_loket' AND jumlah_recall > 0 AND on_hold = false ORDER BY updated_at ASC LIMIT 1";
             $antreanLatest = DB::select($query);
 
             // if antreanLatest is not empty
@@ -223,6 +232,12 @@ class AntreanApiController extends Controller
                         'jumlah_recall' => 0,
                         'updated_by' => $request->requestorUsername,
                     ]);
+                    // update history antrean
+                    $history_antrean = HistoryAntrean::where('nomor_antrean', $antreanLatest->nomor_antrean)
+                        ->where('kode_loket', $request->list_loket)
+                        ->update([
+                            'selesai' => now(),
+                        ]);
                 } catch (\Exception $e) {
                     return response()->json([
                         'status' => false,
@@ -248,7 +263,9 @@ class AntreanApiController extends Controller
                 $query .= "kode_layanan = '$value' OR ";
             }
             $query = substr($query, 0, -4);
-            $query .= ") AND kode_loket = '$request->list_loket' ORDER BY updated_at ASC LIMIT 1";
+            $query .= ") AND kode_loket = '$request->list_loket' AND on_hold = false ORDER BY updated_at ASC LIMIT 1";
+
+
 
 
             // debug query
@@ -264,16 +281,6 @@ class AntreanApiController extends Controller
                 ], 404);
             }
             $antrean = Antrean::find($antrean[0]->id);
-
-            // return response()->json([
-            //     'status' => true,
-            //     'message' => 'Success',
-            //     'data' => $antrean,
-            // ], 200);
-
-            // $antrean = Antrean::where('kode_layanan', $request->list_layanan)
-            //                 ->where('kode_loket', $request->list_loket)
-            //                 ->first();
         }
         if (!$antrean) {
             return response()->json([
@@ -293,9 +300,6 @@ class AntreanApiController extends Controller
                 'jumlah_recall' => $request->jumlah_recall + 1,
                 'updated_by' => $request->requestorUsername,
             ]);
-
-
-
             if ($namaAlur == "1") {
                 $sisa_antrean = Antrean::where('kode_layanan', $request->list_layanan)->where('kode_loket', "0")->count();
 
@@ -323,6 +327,18 @@ class AntreanApiController extends Controller
                 ]);
             }
 
+            // insert to history antrean
+            $history_antrean = DB::table('history_antreans')->insert([
+                'kode_layanan' => $antrean->kode_layanan,
+                'nomor_antrean' => $antrean->nomor_antrean,
+                'kode_loket' => $antrean->kode_loket,
+                'jumlah_recall' => $antrean->jumlah_recall,
+                'mulai' => now(),
+                'selesai' => null,
+            ]);
+
+
+
             return response()->json([
                 'status' => true,
                 'message' => 'Success',
@@ -336,6 +352,174 @@ class AntreanApiController extends Controller
             ], 500);
         }
     }
+
+    // recall
+    public function recall(Request $request)
+    {
+        // Check User is authenticated
+        $user = User::where('username', $request->requestorUsername)->first();
+        if (!$user || $user->role != 'administrator') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'data' => null,
+            ], 401);
+        }
+
+        // check if above data is suitable with alur
+        $alur = Alur::where('nama', $request->nama)->where('list_layanan', $request->list_layanan)->first();
+        if (!$alur) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Alur not found',
+                'data' => null,
+            ], 404);
+        }
+
+
+
+        // check if list_layanan is available in tabel alur field list_transfer (array string)
+        $list_layananAlur = explode(',', $alur->list_layanan);
+        $list_layananRequest = explode(',', $request->list_layanan);
+        $check = array_intersect($list_layananRequest, $list_layananAlur);
+        if (count($check) != count($list_layananRequest)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'List Layanan not found',
+                'data' => null,
+            ], 404);
+        }
+
+        $recall = DB::table('antreans')
+            ->where('kode_loket', $request->list_loket)
+            ->where('on_hold', false)
+            ->where('jumlah_recall', '>', 0)
+            ->first();
+
+        if (!$recall) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Antrean not found',
+                'data' => null,
+            ], 404);
+        }
+
+        // update recall antrean set status_panggilan = true and jumlah_recall + 1
+        try {
+            $recall = DB::table('antreans')
+                ->where('kode_loket', $request->list_loket)
+                ->where('on_hold', false)
+                ->where('jumlah_recall', '>', 0)
+                ->update([
+                    'status_panggilan' => true,
+                    'jumlah_recall' => $recall->jumlah_recall + 1,
+                    'updated_by' => $request->requestorUsername,
+                ]);
+
+            // get jumlah_recall
+            $recall = DB::table('antreans')
+                ->where('kode_loket', $request->list_loket)
+                ->where('on_hold', false)
+                ->where('jumlah_recall', '>', 0)
+                ->first();
+
+            // update latest history antrean set jumlah_recall +1 based on kode_loket 
+            $history_antrean = DB::table('history_antreans')
+                ->where('kode_loket', $request->list_loket)
+                ->where('selesai', null)
+                ->update([
+                    'jumlah_recall' => $recall->jumlah_recall,
+                ]);
+
+
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Success',
+                'data' => $recall,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'FailedS',
+                'data' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // hold
+    public function hold(Request $request)
+    {
+        // Check User is authenticated
+        $user = User::where('username', $request->requestorUsername)->first();
+        if (!$user || $user->role != 'administrator') {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'data' => null,
+            ], 401);
+        }
+
+        // check if above data is suitable with alur
+        $alur = Alur::where('nama', $request->nama)->where('list_layanan', $request->list_layanan)->first();
+        if (!$alur) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Alur not found',
+                'data' => null,
+            ], 404);
+        }
+
+        // check if list_layanan is available in tabel alur field list_transfer (array string)
+        $list_layananAlur = explode(',', $alur->list_layanan);
+        $list_layananRequest = explode(',', $request->list_layanan);
+        $check = array_intersect($list_layananRequest, $list_layananAlur);
+        if (count($check) != count($list_layananRequest)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'List Layanan not found',
+                'data' => null,
+            ], 404);
+        }
+
+        $hold = DB::table('antreans')
+            ->where('kode_loket', $request->list_loket)
+            ->where('on_hold', false)
+            ->where('jumlah_recall', '>', 0)
+            ->first();
+
+        if (!$hold) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Antrean not found',
+                'data' => null,
+            ], 404);
+        }
+
+        // update recall antrean set status_panggilan = false and jumlah_recall + 1
+        try {
+            $hold = DB::table('antreans')
+                ->where('kode_loket', $request->list_loket)
+                ->where('jumlah_recall', '>', 0)
+                ->update([
+                    'on_hold' => true,
+                    'updated_by' => $request->requestorUsername,
+                ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Success',
+                'data' => $hold,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'FailedS',
+                'data' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     // delete antrean
     public function delete(Request $request, $id)

@@ -21,7 +21,8 @@
     <script src="{{ asset('') }}assets/plugins/jquery/jquery.min.js"></script>
 
     <link href="{{ asset('') }}assets/dist/css/select2/select2.min.css" rel="stylesheet" />
-    <link href="{{ asset('') }}/css/style.css" rel="stylesheet" />
+    {{-- <link href="{{ asset('') }}/css/style.css" rel="stylesheet" /> --}}
+    <link rel="stylesheet" href="{{ asset('css/ben.css') }}">
     {{-- <link rel="stylesheet" href="http://etn_invoice.test/assets/dist/css/adminlte.min.css"> --}}
     {{-- filepond --}}
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
@@ -34,7 +35,7 @@
         rel="stylesheet">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.bootstrap4.min.css"> --}}
-    <link rel="stylesheet" href="{{ asset('css/ben.css') }}">
+
     @stack('custom-css')
 </head>
 

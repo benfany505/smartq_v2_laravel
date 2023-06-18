@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('kode_loket')->default(0);
             $table->boolean('status_panggilan')->default(false);
             $table->integer('jumlah_recall')->default(0);
+            $table->boolean('on_hold')->default(false);
             $table->integer('sisa_antrean')->default(0);
             $table->string('created_by');
             $table->string('updated_by')->nullable();
