@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('list_loket');
             $table->string('list_layanan');
-            $table->string('list_transfer');
+            $table->string('list_transfer')->nullable();
             $table->string('keterangan');
             $table->boolean('status');
             $table->string('created_by');

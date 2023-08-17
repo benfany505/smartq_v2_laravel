@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('nama');
             $table->boolean('status');
             $table->string('created_by');
-            $table->string('updated_by');
+            $table->string('updated_by')->nullable();
             $table->timestamps();
-            $table->string('deleted_by');
+            $table->string('deleted_by')->nullable();
             $table->softDeletes();
         });
     }

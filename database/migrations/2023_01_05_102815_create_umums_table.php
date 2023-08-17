@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -32,6 +33,27 @@ return new class extends Migration
             $table->string('deleted_by')->nullable();
             $table->softDeletes();
         });
+
+        // Insert some stuff
+        DB::table('umums')->insert(
+            array(
+                'perusahaan' => 'EZA TEKNOLOGI NUSANTARA',
+                'alamat1' => 'Jl. Ir H. Juanda',
+                'alamat2' => 'Kuningan Jawa Barat 45512',
+                'telp' => '0811 247505',
+                'logoUrl' => 'https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50',
+                'volume' => '50',
+                'mute' => false,
+                'text' => 'Selamat Datang',
+                'kecepatan' => 0,
+                'folder_video' => 'video',
+                'mode_printer' => '0',
+                'created_by' => 'admin',
+                'updated_by' => 'admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            )
+        );
     }
 
     /**

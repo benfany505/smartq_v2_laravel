@@ -146,13 +146,12 @@ class UserApiController extends Controller
                 'data' => null,
             ], 401);
         }
-
         $success = User::create([
             'full_name' => $request->full_name,
             'username' => $request->username,
             'role' => $request->role,
             'password' => Hash::make($request->password),
-            'created_by' => $user->requestorUsername,
+            'created_by' => $request->requestorUsername,
         ]);
 
         if ($success) {
@@ -162,9 +161,9 @@ class UserApiController extends Controller
                 $file->move(public_path('assets/dist/img'), 'user_photo_' . $userData->id . '.' . $file->getClientOriginalExtension());
                 $userData->image_url = 'assets/dist/img/user_photo_' . $userData->id . '.' . $file->getClientOriginalExtension();
             }
-            $success = $userData->save();
+            $saveData = $userData->save();
 
-            if ($success) {
+            if ($saveData) {
                 return response()->json([
                     'success' => true,
                     'message' => 'User created successfully',

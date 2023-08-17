@@ -30,6 +30,9 @@ class UsersController extends Controller
         $responseUsers = json_decode($responseUsers->getContent());
         $responseUsers = $responseUsers->data;
 
+        // dd
+        // dd($responseUsers);
+
         return view('users.users', [
             'title' => 'Users',
             'users' => $responseUsers,

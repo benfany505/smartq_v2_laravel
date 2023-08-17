@@ -112,6 +112,8 @@
                                     <option style="background-color: #222F3E; " value="{{ $item->nomor }}">
                                         {{ $item->nomor }}. {{ $item->nama }}</option>
                                 @endforeach
+                                {{-- ADD VALUE 99 TANPA TRANSFER --}}
+                               
 
                             </Select>
                         </div>
@@ -275,6 +277,7 @@
             filter: false,
             keepOpen: false,
             placeholder: "Pilih Loket",
+            single: true,
         });
         $("#pilihan_layanan").multipleSelect({
             filter: false,

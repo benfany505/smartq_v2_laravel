@@ -63,6 +63,9 @@ class LaporanApiController extends Controller
         foreach ($laporan as $key => $value) {
             $laporan[$key]['id'] = $history[0]->id;
             $laporan[$key]['pelayanan_avg'] = round($laporan[$key]['pelayanan_avg'] / $laporan[$key]['jumlah_antrean'], 2);
+
+
+            
             //    add tanggal format d-m-Y from $history->mulai
             $laporan[$key]['tanggal'] = date('d-m-Y', strtotime($history[0]->mulai));
         }

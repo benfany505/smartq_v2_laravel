@@ -44,7 +44,7 @@ class AntreanApiController extends Controller
         if (!$user || $user->role != 'administrator') {
             return response()->json([
                 'status' => false,
-                'message' => 'Unauthorized',
+                'message' => 'Unauthorizedss',
                 'data' => null,
             ], 401);
         }
@@ -92,7 +92,7 @@ class AntreanApiController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Success',
+                'message' => 'Successee',
                 'data' => $antrean,
             ], 201);
         } catch (\Exception $e) {
@@ -174,8 +174,14 @@ class AntreanApiController extends Controller
         }
 
 
-        // check if above data is suitable with alur
-        $alur = Alur::where('nama', $request->nama)->where('list_layanan', $request->list_layanan)->first();
+        // check if above data is suitable with alur for list_layanan and list_loket and list_transfer
+        // $alur = Alur::where('kode_layanan', $request->kode_layanan)->where('kode_loket', $request->kode_loket)->first();
+        $alur = Alur::where('nama', $request->nama)
+                ->Where('list_loket', $request->list_loket)
+                ->where('list_layanan', $request->list_layanan)
+                ->where('list_transfer', $request->list_transfer)
+                ->first();
+       
         if (!$alur) {
             return response()->json([
                 'status' => false,
